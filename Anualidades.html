@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="Author"content ="Chaira Zapa, Luis Gabriel">
+    <link rel="icon" href="images/icon.png">
+    <link rel="stylesheet" href="css/estildos.css">
+  
+    <title>FinancePro</title>
+</head>
+<body>
+     
+  <header class="header" >
+         
+    <div class="menu-container">
+      <ul class="menu">
+        <li><a href="index.html">Home</a></li>
+          <!-- <li><a href="../HTML/pag2.html">Amortización o capitalización</a></li> -->
+          <li><a href="Anualidades.html">Annuities</a></li>
+          <li><a href="Gradiente.html">Gradients</a></li>
+          <li><a href="AlternativasInversion.html">Investment</a></li>
+      </ul>
+  </div>
+</header>
+
+
+  <div class="formulario">
+    <h1>AQUÍ PUEDES CALCULAR:</h1>
+    <form id="calcForm">
+        <select id="Tema" name="calculo" required>
+            <option value=""></option>
+            <option value="vencida">ANUALIDAD VENCIDA</option>
+            <option value="anticipada">ANUALIDAD ANTICIPADA</option>
+        </select>
+        <br>
+        <select id ="variable" onclick="showContent(this.value)" required>
+          <option value=""></option>
+          <option value="VP">Valor Presente</option>
+          <option value="VF">Valor final</option>
+          <option value="nVP">Número periodos usando valor presente</option>
+          <option value="nVF">Número periodos usando valor final</option>
+          <option value="AVP">Anualidad usando valor presente</option>
+          <option value="AVF">Anualidad usando valor final</option>
+        </select> 
+
+        <div id = "contenido">
+          
+        </div>
+        <br>
+        <select id="tabla">
+          <option value=""></option>
+          <option value="Amortizar">Amortizar</option>
+          <option value="Capitalizar">Capitalizar</option>
+        </select>
+        <br>
+        <button type="button" onclick="calcular()">CALCULAR</button>
+
+        <label for="resultado">RESULTADO:</label>
+        <input type="number" id="resultado" name="resultado" readonly>
+        <br>
+        <div id="result" class = "tabla">
+
+        </div>
+    </form>
+</div>
+
+<script>
+
+    function limpiarCampos(){
+              document.getElementById('Tema').value="";
+              document.getElementById('variable').value="";
+              document.getElementById('tabla').value="";
+              document.getElementById('dato1').value="";
+              document.getElementById('dato2').value="";
+              document.getElementById('dato3').value="";
+    }
+
+    function realizarTabla(selectTabla,VP,A,n,i){
+      if(selectTabla == "Capitalizar"){
+                capitalizarAmortizarAnualidades(VP,A,n,i,1);
+              }else if(selectTabla == "Amortizar"){
+                capitalizarAmortizarAnualidades(VP,A,n,i,2);
+              }
+    }
+
+    function showContent(variable){
+      const contenido = document.getElementById("contenido");
+      contenido.innerHTML = '';
+
+      switch(variable){
+        case 'VP':
+        case 'VF':
+          contenido.innerHTML = '<br><label>Anualidad</label><br>'+
+                                '<input type = "number" id = "dato1" placeholder="Ingrese (A)" required></input><br>'+
+                                '<label>Tasa de interes</label><br>'+
+                                '<input type = "number" id = "dato2" placeholder="Ingrese (i)" required></input><br>'+
+                                '<label>Número de periodos</label><br>'+
+                                '<input type = "number" id = "dato3" placeholder="Ingrese (n)" required></input>'
+       
+        break;
+        case 'nVP':
+        contenido.innerHTML = '<br><label>Anualidad</label><br>'+
+                                '<input type = "number" id = "dato1" placeholder="Ingrese (A)" required></input><br>'+
+                                '<label>Valor Presente</label><br>'+
+                                '<input type = "number" id = "dato2" placeholder="Ingrese (VP)" required></input><br>'+
+                                '<label>Tasa de interés</label><br>'+
+                                '<input type = "number" id = "dato3" placeholder="Ingrese (i)" required></input>'
+          break;
+          case 'nVF':
+          contenido.innerHTML = '<br><label>Anualidad</label><br>'+
+                                '<input type = "number" id = "dato1" placeholder="Ingrese (A)" required></input><br>'+
+                                '<label>Valor Futuro</label><br>'+
+                                '<input type = "number" id = "dato2" placeholder="Ingrese (VP)" required></input><br>'+
+                                '<label>Tasa de interés</label><br>'+
+                                '<input type = "number" id = "dato3" placeholder="Ingrese (i)" required></input>'
+            break;
+            case 'AVP':
+            contenido.innerHTML = '<br><label>Valor Presente</label><br>'+
+                                '<input type = "number" id = "dato1" placeholder="Ingrese (VP)" required></input><br>'+
+                                '<label>Tasa de interés</label><br>'+
+                                '<input type = "number" id = "dato2" placeholder="Ingrese (i)" required></input><br>'+
+                                '<label>Número periodos</label><br>'+
+                                '<input type = "number" id = "dato3" placeholder="Ingrese (n)" required></input>'
+            break;
+            case 'AVF':
+            contenido.innerHTML = '<br><label>Valor Final</label><br>'+
+                                '<input type = "number" id = "dato1" placeholder="Ingrese (VP)" required></input><br>'+
+                                '<label>Tasa de interés</label><br>'+
+                                '<input type = "number" id = "dato2" placeholder="Ingrese (i)" required></input><br>'+
+                                '<label>Número periodos</label><br>'+
+                                '<input type = "number" id = "dato3" placeholder="Ingrese (n)" required></input>'
+              break;
+        default: 
+          break;
+      }
+
+    }
+
+    function calcular(){
+      const selectTema = document.getElementById('Tema').value;
+      const selectVariable = document.getElementById('variable').value;
+      const selectTabla = document.getElementById('tabla').value;
+    
+
+      if(selectTema == "" && selectVariable == "" && selectTabla == ""){
+        alert('No ha seleccionado ninguna opción, seleccione una');
+        return;
+      }
+      if(selectTema == ""){
+        alert('Por favor seleccione al menos un tema');
+        return;
+      }
+      if(selectVariable == ""){
+        alert('Por favor seleccione al menos una variable');
+        return;
+      }
+      if(selectTabla == ""){
+        alert('Por favor seleccione al menos un caso para la tabla');
+        return;
+      }
+     
+      if(selectTema == "vencida"){
+        switch (selectVariable) {
+          case 'VP':
+                var A = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value) / 100;
+                var n = parseFloat(document.getElementById('dato3').value);
+
+              var VP = A*((1+i)**(n)-1)/(i*(1+i)**n);
+
+              document.getElementById('resultado').value = VP;
+
+              realizarTabla(selectTabla,VP,A,n,i);
+
+              limpiarCampos();
+
+          break;
+          case 'VF':
+                var A = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value) / 100;
+                var n = parseFloat(document.getElementById('dato3').value);
+
+                var VF = A*(((1+i)**(n)-1)/i);
+
+                document.getElementById('resultado').value = VF;
+
+                realizarTabla(selectTabla,0,A,n,i);
+
+                limpiarCampos();
+          break; 
+          case 'nVP':
+                A = parseFloat(document.getElementById('dato1').value);
+                VP = parseFloat(document.getElementById('dato2').value);
+                i = parseFloat(document.getElementById('dato3').value)/100;
+
+                var nVP = parseFloat((Math.log(A)-Math.log(A-(VP*i)))/(Math.log(1+i)));
+                var n = parseFloat(Math.round(nVP));
+
+                document.getElementById('resultado').value = n;
+
+                realizarTabla(selectTabla,VP,A,n,i);
+
+                limpiarCampos();
+
+          break;
+          case 'nVF':
+                var A = parseFloat(document.getElementById('dato1').value);
+                var VF = parseFloat(document.getElementById('dato2').value);
+                var i = parseFloat(document.getElementById('dato3').value)/100;
+
+                var nVF = parseFloat((Math.log(VF*i+A)-Math.log(A))/(Math.log(1+i)));
+                var n = parseFloat(Math.round(nVF));
+
+                document.getElementById('resultado').value = n;
+
+                realizarTabla(selectTabla,0,A,n,i);
+
+                limpiarCampos();
+          break;
+          case 'AVP':
+                var VP = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value)/100
+                var n = parseFloat(document.getElementById('dato3').value);
+
+                A = VP*(i*(1+i)**n)/((1+i)**n-1);
+
+                document.getElementById('resultado').value = A;
+
+                realizarTabla(selectTabla,VP,A,n,i);
+
+                limpiarCampos();
+
+          break;
+          case 'AVF': 
+                var VF = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value)/100
+                var n = parseFloat(document.getElementById('dato3').value);
+
+                A = VF/(((1+i)**(n)-1)/i);
+
+                document.getElementById('resultado').value = A;
+
+                realizarTabla(selectTabla,0,A,n,i);
+
+                limpiarCampos();
+          break;
+          default:
+            break;
+        }
+      }else if(selectTema == "anticipada"){
+        switch(selectVariable){
+            case 'VP':
+                var A = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value)/100;
+                var n = parseFloat(document.getElementById('dato3').value);
+
+                VP = A*(1+i)*(((1+i)**n)-1)/(i*(1+i)**n);
+
+                document.getElementById('resultado').value = VP;
+
+                realizarTabla(selectTabla,VP,A,n,i);
+
+                limpiarCampos();
+
+            break;
+            case 'VF':
+                var A = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value)/100;
+                var n = parseFloat(document.getElementById('dato3').value);
+
+                VF = A*(1+i)*(((1+i)**n)-1)/i;
+
+                document.getElementById('resultado').value = VF;
+
+                realizarTabla(selectTabla,0,A,n,i);
+
+                limpiarCampos();
+            break;
+            case 'nVP':
+                var A = parseFloat(document.getElementById('dato1').value);
+                var VP = parseFloat(document.getElementById('dato2').value);
+                var i = parseFloat(document.getElementById('dato3').value)/100;
+
+                nVP = parseFloat(log(1+(A*i)/(A-VP))/log(1+i));
+                n = parseFloat(Math.round(nVP));
+
+                document.getElementById('resultado').value = n; 
+                
+                realizarTabla(selectTabla,VP,A,n,i);
+
+                limpiarCampos();
+            break;
+            case 'nVF':
+                var A = parseFloat(document.getElementById('dato1').value);
+                var VF = parseFloat(document.getElementById('dato2').value);
+                var i = parseFloat(document.getElementById('dato3').value)/100;
+
+                nVF = parseFloat((Math.log(VF*i/A+1)-Math.log(1+i))/Math.log(1+i));
+                n = parseFloat(Math.round(nVF));
+
+                document.getElementById('resultado').value = n; 
+                
+                realizarTabla(selectTabla,0,A,n,i);
+
+                limpiarCampos();
+            break;
+            case 'AVP':
+                var VP = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value)/100;
+                var n = parseFloat(document.getElementById('dato3').value);
+
+                A = VP/((1+i)*(((1+i)**n)-1)/(i*(1+i)**n));
+
+                document.getElementById('resultado').value = A; 
+
+                realizarTabla(selectTabla,VP,A,n,i);
+
+                limpiarCampos();
+            break;
+            case 'AVF':
+                var VF = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value)/100;
+                var n = parseFloat(document.getElementById('dato3').value);
+
+                var denominador = (1+i)*((1+i)**(n)-1)/(i);
+
+                A = VF/denominador;
+
+                document.getElementById('resultado').value = A; 
+
+                realizarTabla(selectTabla,0,A,n,i);
+
+                limpiarCampos();
+            break;
+            default:
+            break;
+        }
+      }
+
+    }
+
+    function capitalizarAmortizarAnualidades(va, a, periodo, i, operacionTabla) {
+    let n = Math.round(periodo);
+
+    if (operacionTabla == 1) {
+        let saldo = va;
+        let tableHTML = "<table border='1'>" +
+            "<tr><th>N°</th><th>Cuotas</th><th>Interes</th><th>Abono</th><th>Saldo</th></tr>";
+
+        for (let index = 0; index <= n; index++) {
+            if (index == 0){
+              tableHTML += "<tr><td>" + index + "</td><td>" + "" + "</td><td>" + "" + "</td><td>" + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            }else{
+            let interes = saldo * i;
+            let abono = a + interes;
+            saldo += abono;
+            tableHTML += "<tr><td>" + index + "</td><td>" + a.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            }
+        }
+
+        tableHTML += "</table>";
+        document.getElementById('result').innerHTML = tableHTML;
+    } else if (operacionTabla == 2) {
+        let saldo = va;
+        let tableHTML = "<table border='1'>" +
+            "<tr><th>N°</th><th>Cuotas</th><th>Interes</th><th>Abono</th><th>Saldo</th></tr>";
+
+        for (let index = 0; index <= n; index++) {
+          if (index == 0){
+            tableHTML += "<tr><td>" + index + "</td><td>" + "" + "</td><td>" + "" + "</td><td>" + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            }else{
+            let interes = saldo * i;
+            let abono = a - interes;
+            saldo -= abono;
+            tableHTML += "<tr><td>" + index + "</td><td>" + a.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            }
+        }
+
+        tableHTML += "</table>";
+        document.getElementById('result').innerHTML = tableHTML;
+    }
+}
+
+</script>
+
+  
+</body>
+</html>

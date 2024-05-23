@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="Author" content="Chaira Zapa">
+  <link rel="icon" href="images/icon.png">
+  <link rel="stylesheet" href="css/estildos.css">
+  <title>Gradientes</title>
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="menu-container">
+      <ul class="menu">
+        <li><a href="index.html">Inicio</a></li>
+        <!-- <li><a href="../HTML/pag2.html">Amortización o capitalización</a></li> -->
+        <li><a href="Anualidades.html">Anualidades</a></li>
+        <li><a href="Gradiente.html">Gradientes</a></li>
+        <li><a href="AlternativasInversion.html">Simulación financiera</a></li>
+      </ul>
+    </div>
+
+  </header>
+
+  <!DOCTYPE html>
+  <html>
+
+  <head>
+    <title>CACULADORA DE GRADIENTES</title>
+  </head>
+
+  <body>
+    <div class="formulario">
+      <h2>Calculadora de Gradientes</h2>
+      <form id="formulario">
+        <label>Selecione el tema</label>
+        <select id="Tema" name="tema">
+          <option value=""></option>
+          <option value="GLC">Gradiente lineal Creciente</option>
+          <option value="GLD">Gradiente lineal decreciente</option>
+          <option value="GGC">Gradiente geométrico creciente</option>
+          <option value="GGD">Gradiente geométrico decreciente</option>
+        </select>
+        <br>
+        <label>Seleccione la variable a calcular</label>
+        <select id="variable" onclick="showContent(this.value)">
+
+        </select>
+        <br>
+        <label>Ingrese los datos:</label>
+        <div id="contenido" class="divContenido">
+
+        </div>
+        <br>
+        <label>Seleccione una opción para la tabla</label>
+        <select id="tabla">
+          <option value=""></option>
+          <option value="Amortizar">Amortizar</option>
+          <option value="Capitalizar">Capitalizar</option>
+        </select>
+        <br>
+        <button type="button" onclick="calcular()">Calcular</button>
+        <br>
+        <label for="resultado">RESULTADO:</label>
+        <input type="number" id="resultado" name="resultado" readonly>
+        <br>
+        <div id="result" class="tabla">
+
+        </div>
+      </form>
+    </div>
+
+    <script>
+      function limpiarCampos() {
+        document.getElementById('Tema').value = "";
+        document.getElementById('variable').value = "";
+        document.getElementById('tabla').value = "";
+        document.getElementById('dato1').value = "";
+        document.getElementById('dato2').value = "";
+        document.getElementById('dato3').value = "";
+        document.getElementById('dato4').value = "";
+      }
+
+      function limpiarCamposException() {
+        document.getElementById('Tema').value = "";
+        document.getElementById('variable').value = "";
+        document.getElementById('tabla').value = "";
+        document.getElementById('dato1').value = "";
+        document.getElementById('dato2').value = "";
+        document.getElementById('dato3').value = "";
+      }
+
+      
+
+      function realizarTablaGLC(selectTabla,VP, n, i, A, G) {
+        if (selectTabla == "Capitalizar") {
+          capitalizarAmortizarGLC(VP,n, i, A, G, 1);
+        } else if (selectTabla == "Amortizar") {
+          capitalizarAmortizarGLC(VP,n, i, A, G, 2);
+        }
+      }
+
+      function realizarTablaGLD(selectTabla,VP, n, i, A, G) {
+        if (selectTabla == "Capitalizar") {
+          capitalizarAmortizarGLD(VP,n, i, A, G, 1);
+        } else if (selectTabla == "Amortizar") {
+          capitalizarAmortizarGLD(VP,n, i, A, G, 2);
+        }
+      }
+
+      function realizarTablaGGC(selectTabla,VP, n, i, A, G) {
+        if (selectTabla == "Capitalizar") {
+          capitalizarAmortizarGGC(VP,n, i, A, G, 1);
+        } else if (selectTabla == "Amortizar") {
+          capitalizarAmortizarGGC(VP,n, i, A, G, 2);
+        }
+      }
+
+      function realizarTablaGGD(selectTabla,VP, n, i, A, G) {
+        if (selectTabla == "Capitalizar") {
+          capitalizarAmortizarGGD(VP,n, i, A, G, 1);
+        } else if (selectTabla == "Amortizar") {
+          capitalizarAmortizarGGD(VP,n, i, A, G, 2);
+        }
+      }
+      
+      function handleTemaSelection(tema) {
+        const selectVariable = document.getElementById('variable');
+        selectVariable.innerHTML = '';
+
+        switch (tema) {
+          case 'GLC':
+          case 'GLD':
+            selectVariable.innerHTML = '';
+
+            const opcionesGLCyGLD = ['', 'Valor final',
+              'Valor presente', 'Gradiente lineal usando valor presente',
+              'Gradiente lineal usando valor final',
+              'Anualidad con valor presente',
+              'Anualidad con valor final'];
+
+            const valuesOpcionesGLCyGLD = ['',
+              'VFGL',
+              'VPGL',
+              'GLCVP',
+              'GLCVF',
+              'AVPGLC',
+              'AVFGLC'];
+
+            opcionesGLCyGLD.forEach((opcion, values) => {
+              const option = document.createElement('option');
+              option.value = valuesOpcionesGLCyGLD[values];
+              option.text = opcion;
+              selectVariable.appendChild(option);
+            });
+            break;
+          case 'GGC':
+            selectVariable.innerHTML = '';
+
+            const opcionesGGC = ['',
+                    'Valor Presente','Valor presente para J = i',
+                    'Valor final',
+                    'Anualidad usando valor presente',
+                    'Anualidad usando valor final'
+                    ];
+
+            const valuesOpcionesGGC = ['',
+                    'VPGG','VP_para_J_igual_a_i', 'VFGG','AVP','AVF'
+                    ];
+
+            opcionesGGC.forEach((opcion, values) => {
+              const option = document.createElement('option');
+              option.value = valuesOpcionesGGC[values];
+              option.text = opcion;
+              selectVariable.appendChild(option);
+            });
+            break;
+          case 'GGD':
+            selectVariable.innerHTML = "";
+
+            const opcionesGGD =
+              ['', 'Valor presente', 'Valor presente para J = i'];
+
+            const valuesOpcionesGGD = ['', 'VPGG', 'VP_para_J_igual_a_i_GGD'];
+
+            opcionesGGD.forEach((opcion, values) => {
+              const option = document.createElement('option');
+              option.value = valuesOpcionesGGD[values];
+              option.text = opcion;
+              selectVariable.appendChild(option);
+            });
+            break;
+          default:
+            break
+        }
+
+      }
+
+      function showContent(variable) {
+        const contenido = document.getElementById("contenido");
+        contenido.innerHTML = '';
+
+        switch (variable) {
+          case 'VFGL':
+            contenido.innerHTML = '<label>Anualidad</label><br>' +
+              '<input type="text" id="dato1" placeholder="Dato 1 (A)"><br>' +
+              '<label>Tasa de interés</label><br>' +
+              '<input type="text" id="dato2" placeholder="Dato 2 (i)"><br>' +
+              '<label>Numero de periodos</label><br>' +
+              '<input type="text" id="dato3" placeholder="Dato 3 (n)"><br>' +
+              '<label>Gradiente</label><br>' +
+              '<input type="text" id="dato4" placeholder="Dato 4 (G)"><br>';
+            break;
+          case 'VPGL':
+            contenido.innerHTML = '<label>Anualidad</label><br>' +
+              '<input type="text" id="dato1" placeholder="Dato 1 (A)"><br>' +
+              '<label>Tasa de interés</label><br>' +
+              '<input type="text" id="dato2" placeholder="Dato 2 (i)"><br>' +
+              '<label>Numero de periodos</label><br>' +
+              '<input type="text" id="dato3" placeholder="Dato 3 (n)"><br>' +
+              '<label>Gradiente</label><br>' +
+              '<input type="text" id="dato4" placeholder="Dato 4 (G)"><br>';
+            break;
+          case 'GLCVP':
+            contenido.innerHTML = '<label>Valor Presente</label><br>' +
+              '<input type="text" id="dato1" placeholder="Dato 1 (VP)"><br>' +
+              '<label>Tasa de interés</label><br>' +
+              '<input type="text" id="dato2" placeholder="Dato 2 (i)"><br>' +
+              '<label>Numero de periodos</label><br>' +
+              '<input type="text" id="dato3" placeholder="Dato 3 (n)"><br>' +
+              '<label>Anualidad</label><br>' +
+              '<input type="text" id="dato4" placeholder="Dato 4 (A)"><br>';
+            break;
+          case 'GLCVF':
+            contenido.innerHTML = '<label>Valor Final</label><br>' +
+              '<input type="text" id="dato1" placeholder="Dato 1 (VF)"><br>' +
+              '<label>Tasa de interés</label><br>' +
+              '<input type="text" id="dato2" placeholder="Dato 2 (i)"><br>' +
+              '<label>Numero de periodos</label><br>' +
+              '<input type="text" id="dato3" placeholder="Dato 3 (n)"><br>' +
+              '<label>Anualidad</label><br><br>' +
+              '<input type="text" id="dato4" placeholder="Dato 4 (A)"><br>';
+            break;
+          case 'AVPGLC':
+            contenido.innerHTML = '<label>Valor presente</label><br>' +
+              '<input type="text" id="dato1" placeholder="Dato 1 (VP)"><br>' +
+              '<label>Tasa de interés</label><br>' +
+              '<input type="text" id="dato2" placeholder="Dato 2 (i)"><br>' +
+              '<label>Numero de periodos</label><br>' +
+              '<input type="text" id="dato3" placeholder="Dato 3 (n)"><br>' +
+              '<label>Gradiente</label><br>' +
+              '<input type="text" id="dato4" placeholder="Dato 4 (G)"><br>';
+            break;
+          case 'AVFGLC':
+            contenido.innerHTML = '<label>Valor final</label><br>' +
+              '<input type="text" id="dato1" placeholder="Dato 1 (VF)"><br>' +
+              '<label>Tasa de interés</label><br>' +
+              '<input type="text" id="dato2" placeholder="Dato 2 (i)"><br>' +
+              '<label>Numero de periodos</label><br>' +
+              '<input type="text" id="dato3" placeholder="Dato 3 (n)"><br>' +
+              '<label>Gradiente</label><br>' +
+              '<input type="text" id="dato4" placeholder="Dato 4 (G)"><br>';
+            break;
+          case 'VPGG':
+            contenido.innerHTML = '<label>Anualidad</label><br>' +
+              '<input type="text" id="dato1" placeholder="Dato 1 (A)"><br>' +
+              '<label>Tasa de interés</label><br>' +
+              '<input type="text" id="dato2" placeholder="Dato 2 (i)"><br>' +
+              '<label>Numero de periodos</label><br>' +
+              '<input type="text" id="dato3" placeholder="Dato 3 (n)"><br>' +
+              '<label>Gradiente</label><br>' +
+              '<input type="text" id="dato4" placeholder="Dato 4 (J)"><br>';
+            break;
+          case 'VP_para_J_igual_a_i':
+            contenido.innerHTML = '<label>Anualidad</label><br>' +
+              '<input type="text" id="dato1" placeholder="Dato 1 (A)"><br>' +
+              '<label>Tasa de interés</label><br>' +
+              '<input type="text" id="dato2" placeholder="Dato 2 (i)"><br>' +
+              '<label>Numero de periodos</label><br>' +
+              '<input type="text" id="dato3" placeholder="Dato 3 (n)"><br>'
+            break;
+          case 'VFGG':
+            contenido.innerHTML = '<label>Anualidad</label><br>' +
+              '<input type="text" id="dato1" placeholder="Dato 1 (A)"><br>' +
+              '<label>Tasa de interés</label><br>' +
+              '<input type="text" id="dato2" placeholder="Dato 2 (i)"><br>' +
+              '<label>Numero de periodos</label><br>' +
+              '<input type="text" id="dato3" placeholder="Dato 3 (n)"><br>' +
+              '<label>Gradiente</label><br>' +
+              '<input type="text" id="dato4" placeholder="Dato 4 (J)"><br>';
+            break;
+          case 'VP_para_J_igual_a_i_GGD':
+            contenido.innerHTML = '<label>Anualidad</label><br>' +
+              '<input type="text" id="dato1" placeholder="Dato 1 (A)"><br>' +
+              '<label>Tasa de interés</label><br>' +
+              '<input type="text" id="dato2" placeholder="Dato 2 (i)"><br>'
+            break;
+          case 'AVP':
+            contenido.innerHTML = '<label>Valor presente</label><br>' +
+              '<input type="text" id="dato1" placeholder="Dato 1 (VP)"><br>' +
+              '<label>Tasa de interés</label><br>' +
+              '<input type="text" id="dato2" placeholder="Dato 2 (i)"><br>' +
+              '<label>Numero de periodos</label><br>' +
+              '<input type="text" id="dato3" placeholder="Dato 3 (n)"><br>' +
+              '<label>Gradiente</label><br>' +
+              '<input type="text" id="dato4" placeholder="Dato 4 (J)"><br>';
+            break;
+          case 'AVF':
+            contenido.innerHTML = '<label>Valor Final</label><br>' +
+              '<input type="text" id="dato1" placeholder="Dato 1 (VF)"><br>' +
+              '<label>Tasa de interés</label><br>' +
+              '<input type="text" id="dato2" placeholder="Dato 2 (i)"><br>' +
+              '<label>Numero de periodos</label><br>' +
+              '<input type="text" id="dato3" placeholder="Dato 3 (n)"><br>' +
+              '<label>Gradiente</label><br>' +
+              '<input type="text" id="dato4" placeholder="Dato 4 (J)"><br>';
+            break;
+          default:
+            break;
+        }
+
+      }
+
+      function calcular() {
+        const selectTema = document.getElementById('Tema').value;
+        const selectVariable = document.getElementById('variable').value;
+        const selectTabla = document.getElementById('tabla').value;
+
+
+        if (selectTema == "" && selectVariable == "" && selectTabla == "") {
+          alert('No ha seleccionado ninguna opción, seleccione una');
+          return;
+        }
+        if (selectTema == "") {
+          alert('Por favor seleccione al menos un tema');
+          return;
+        }
+        if (selectVariable == "") {
+          alert('Por favor seleccione al menos una variable');
+          return;
+        }
+        if (selectTabla == "") {
+          alert('Por favor seleccione al menos un caso para la tabla');
+          return;
+        }
+
+        if(selectTema == "GLC"){
+            switch(selectVariable){
+              //Gradiente lineal creciente
+              case 'VFGL':
+                var A = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value)/100;
+                var n = parseFloat(document.getElementById('dato3').value);
+                var G = parseFloat(document.getElementById('dato4').value);
+
+                formula1 = A*((1+i)**(n)-1)/(i);
+                formula2 = G/i;
+                formula3 = ((1+i)**(n)-1)/(i)-n;
+
+                var VF = formula1+formula2*formula3;
+                
+                document.getElementById('resultado').value = VF;
+
+                realizarTablaGLC(selectTabla,0,n,i,A,G);
+
+                limpiarCampos();
+              break;
+              case 'VPGL':
+                var A = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value)/100;
+                var n = parseFloat(document.getElementById('dato3').value);
+                var G = parseFloat(document.getElementById('dato4').value);
+
+                parte1 = A*((1+i)**(n)-1)/(i*((1+i)**n));
+                parte2 = G/i;
+                parte3 = ((1+i)**(n)-1)/(i*((1+i)**n))-(n)/((1+i)**n);
+
+                var VP = parte1+parte2*parte3;
+
+                document.getElementById('resultado').value = VP;
+
+                realizarTablaGLC(selectTabla,VP,n,i,A,G);
+
+                limpiarCampos();
+              break;
+              case 'GLCVP':
+                var VP = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value)/100;
+                var n = parseFloat(document.getElementById('dato3').value);
+                var A = parseFloat(document.getElementById('dato4').value);
+
+                var G = i*((VP-(A*((((1+i)**n)-1)/(i*((1+i)**n)))))/(((((1+i)**n)-1)/(i*((1+i)**n)))-(n/((1+i)**n))));
+
+              document.getElementById('resultado').value = G;
+
+              realizarTablaGLC(selectTabla,VP,n,i,A,G);
+
+              limpiarCampos();
+              break;
+              case 'GLCVF':
+                var VF = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value)/100;
+                var n = parseFloat(document.getElementById('dato3').value);
+                var A = parseFloat(document.getElementById('dato4').value);
+
+                var G = i*((VF-(A*((((1+i)**n)-1)/i)))/(((((1+i)**n)-1)/i)-n));
+
+                document.getElementById('resultado').value = G;
+
+                realizarTablaGLC(selectTabla,0,n,i,A,G);
+
+                limpiarCampos();
+              break;
+              case 'AVPGLC':
+                var VP = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value)/100;
+                var n = parseFloat(document.getElementById('dato3').value);
+                var G = parseFloat(document.getElementById('dato4').value);
+
+                var parteUnoEcuacion = ((1+i)**(n)-1)/(i*((1+i)**n));
+                var parteDosEcuacion = -((G/i)*((1+i)**(n)-1)/(i*((1+i)*n))-(n)/((1+i)*n));
+
+                var A = (VP+parteDosEcuacion)/parteUnoEcuacion;
+
+                document.getElementById('resultado').value = A;
+
+                realizarTablaGLC(selectTabla,VP,n,i,A,G);
+
+                limpiarCampos();
+              break;
+              case 'AVFGLC':
+                var VF = parseFloat(document.getElementById('dato1').value);
+                var i = parseFloat(document.getElementById('dato2').value)/100;
+                var n = parseFloat(document.getElementById('dato3').value);
+                var G = parseFloat(document.getElementById('dato4').value);
+
+                var A = (VF-((G/i)*(((((1+i)**n)-1)/i)-n)))/((((1+i)**n)-1)/i);
+
+                document.getElementById('resultado').value = A;
+
+                realizarTablaGLC(selectTabla,0,n,i,A,G);
+
+                limpiarCampos();
+              default:
+              break;
+            }
+        }else if (selectTema=="GLD"){
+          switch (selectVariable){
+            case 'VFGL':
+              var A = parseFloat(document.getElementById('dato1').value);
+              var i = parseFloat(document.getElementById('dato2').value)/100;
+              var n = parseFloat(document.getElementById('dato3').value);
+              var G = parseFloat(document.getElementById('dato4').value);
+
+              formula1 = A*((1+i)**(n)-1)/(i);
+              formula2 = G/i;
+              formula3 = ((1+i)**(n)-1)/(i)-n;
+
+              var VF = formula1-formula2+formula3;
+
+              document.getElementById('resultado').value= VF;
+
+              realizarTablaGLD(selectTabla,0,n,i,A,G);
+
+              limpiarCampos();
+            break;
+            case 'VPGL':
+              var A = parseFloat(document.getElementById('dato1').value);
+              var i = parseFloat(document.getElementById('dato2').value)/100;
+              var n = parseFloat(document.getElementById('dato3').value);
+              var G = parseFloat(document.getElementById('dato4').value);
+
+              parte1 = A*((1+i)**(n)-1)/(i*((1+i)**n));
+              parte2 = G/i;
+              parte3 = ((1+i)**(n)-1)/(i*((1+i)**n))-(n)/((1+i)**n);
+
+              var VP = parte1 - (parte2*parte3);
+
+              document.getElementById('resultado').value = VP;
+
+              realizarTablaGLD(selectTabla,VP,n,i,A,G);
+
+              limpiarCampos();
+            break;
+            case 'GLCVP':
+              var VP = parseFloat(document.getElementById('dato1').value);
+              var i = parseFloat(document.getElementById('dato2').value)/100;
+              var n = parseFloat(document.getElementById('dato3').value);
+              var A = parseFloat(document.getElementById('dato4').value);
+
+              var G = i*(((A*((((1+i)**n)-1)/(i*((1+i)**n))))-VP)/(((((1+i)**n)-1)/(i*((1+i)**n)))-(n/((1+i)**n))));
+
+              document.getElementById('resultado').value = G;
+
+              realizarTablaGLD(selectTabla,VP,n,i,A,G);
+
+              limpiarCampos();
+            break;
+            case 'GLCVF':
+              var VF = parseFloat(document.getElementById('dato1').value);
+              var i = parseFloat(document.getElementById('dato2').value)/100;
+              var n = parseFloat(document.getElementById('dato3').value);
+              var A = parseFloat(document.getElementById('dato4').value);
+
+              var numerador = VF+(A*((((1+i)**n)-1)/i));
+              var denominador = (1/i)*(((((1+i)**n)-1)/i)-n);
+
+              var G = numerador/denominador;
+
+              document.getElementById('resultado').value = G;
+
+              realizarTablaGLD(selectTabla,0,n,i,A,G);
+
+              limpiarCampos();
+            break;
+            case 'AVPGLC':
+              var VP = parseFloat(document.getElementById('dato1').value);
+              var i = parseFloat(document.getElementById('dato2').value)/100;
+              var n = parseFloat(document.getElementById('dato3').value);
+              var G = parseFloat(document.getElementById('dato4').value);
+
+              var parteUnoEcuacion = ((1+i)**(n)-1)/(i*((1+i)**n));
+              var parteDosEcuacion = +((G/i)*((1+i)**(n)-1)/(i*((1+i)*n))-(n)/((1+i)*n));
+
+              var A = (VP+partzeDosEcuacion)/parteUnoEcuacion;
+              
+              document.getElementById('resultado').value = A;
+
+              realizarTablaGLD(selectTabla,VP,n,i,A,G);
+
+              limpiarCampos();
+            break;
+            case 'AVFGLC':
+              var VF = parseFloat(document.getElementById('dato1').value);
+              var i = parseFloat(document.getElementById('dato2').value)/100;
+              var n = parseFloat(document.getElementById('dato3').value);
+              var G = parseFloat(document.getElementById('dato4').value);
+
+              var A = (VF+((G/i)*(((((1+i)**n)-1)/i)-n)))/((((1+i)**n)-1)/i);
+
+              document.getElementById('resultado').value = A;
+
+              realizarTablaGLD(selectTabla,0,n,i,A,G);
+
+              limpiarCampos();
+            break;
+            default:
+            break;
+        }
+
+      }else if(selectTema == "GGC"){
+        switch(selectVariable){
+          case 'VPGG':
+            var A = parseFloat(document.getElementById('dato1').value);
+            var i = parseFloat(document.getElementById('dato2').value)/100;
+            var n = parseFloat(document.getElementById('dato3').value);
+            var J = parseFloat(document.getElementById('dato4').value)/100;
+
+            var VP = A*((((1+J)**n)-((1+i)**n))/((J-i)*((1+i)**n)));
+
+            document.getElementById('resultado').value = VP;
+
+            realizarTablaGGC(selectTabla,VP,n,i,A,J);
+
+            limpiarCampos();
+          break;
+          case 'VFGG':
+            var A = parseFloat(document.getElementById('dato1').value);
+            var i = parseFloat(document.getElementById('dato2').value)/100;
+            var n = parseFloat(document.getElementById('dato3').value);
+            var J = parseFloat(document.getElementById('dato4').value)/100;
+
+            var VF = A*((((1+i)**n)-((1+J)**n))/(i-J));
+
+            document.getElementById('resultado').value = VF;
+
+            realizarTablaGGC(selectTabla,0,n,i,A,J);
+
+            limpiarCampos();
+          break;
+          case 'VP_para_J_igual_a_i':
+            var A = parseFloat(document.getElementById('dato1').value);
+            var i = parseFloat(document.getElementById('dato2').value)/100;
+            var n = parseFloat(document.getElementById('dato3').value);
+            var J = i;
+
+            var VP = (n*A)/(1+i);
+
+            document.getElementById('resultado').value = VP;
+
+            realizarTablaGGC(selectTabla,VP,n,i,A,J);
+
+            limpiarCamposException();
+          break;
+          case 'AVP':
+            var VP = parseFloat(document.getElementById('dato1').value);
+            var i = parseFloat(document.getElementById('dato2').value)/100;
+            var n = parseFloat(document.getElementById('dato3').value);
+            var J = parseFloat(document.getElementById('dato4').value)/100;
+
+            var numerador = (i-J);
+            var denominador = 1-(1+J)**n/(1+i)**n;
+
+            var A = VP*numerador/denominador;
+
+            document.getElementById('resultado').value = A;
+
+            realizarTablaGGC(selectTabla,VP,n,i,A,J);
+
+            limpiarCampos();
+          break;
+          case 'AVF':
+            var VF = parseFloat(document.getElementById('dato1').value);
+            var i = parseFloat(document.getElementById('dato2').value)/100;
+            var n = parseFloat(document.getElementById('dato3').value);
+            var J = parseFloat(document.getElementById('dato4').value)/100;
+
+            var A = VF*((i-J)/(((1+i)**n)-((1+J)**n)));
+
+            document.getElementById('resultado').value = A;
+
+            realizarTablaGGC(selectTabla,0,n,i,A,J);
+
+            limpiarCampos();
+          break;
+          default:
+          break;
+        }
+      }else if(selectTema == "GGD"){
+        switch(selectVariable){
+          case 'VPGG':
+            var A = parseFloat(document.getElementById('dato1').value);
+            var i = parseFloat(document.getElementById('dato2').value)/100;
+            var n = parseFloat(document.getElementById('dato3').value);
+            var J = parseFloat(document.getElementById('dato4').value)/100;
+
+            var VP = VP = A*((((1+i)**n)-((1-J)**n))/((J+i)*((1+i)**n)));
+
+            document.getElementById('resultado').value = VP;
+
+            realizarTablaGGD(selectTabla,VP,n,i,A,J);
+
+            limpiarCampos();
+          break;
+          case 'VP_para_J_igual_a_i_GGD':
+            var A = parseFloat(document.getElementById('dato1').value);
+            var i = parseFloat(document.getElementById('dato2').value)/100;
+            var J = i;
+
+            var VP = A/(1+i);
+
+            document.getElementById('resultado').value = VP;
+
+            document.getElementById('Tema').value = "";
+            document.getElementById('variable').value = "";
+            document.getElementById('tabla').value = "";
+            document.getElementById('dato1').value = "";
+            document.getElementById('dato2').value = "";
+
+          break;
+          default:
+          break;
+        }
+      }
+}
+
+      document.getElementById('Tema').addEventListener('click', function () {
+        const tema = this.value;
+        handleTemaSelection(tema); // Generar opciones del select cuando cambie el tema
+      });
+
+function capitalizarAmortizarGLC(va, periodo, i, a, g, operacionTabla) {
+    let n = Math.round(periodo);
+    if (operacionTabla === 1) {
+        let saldo = va;
+        let cuota = a;
+        let tableHTML = "<table border='1'>" +
+            "<tr><th>Número Cuota</th><th>Cuotas</th><th>Interes</th><th>Abono</th><th>Saldo</th></tr>";
+        for (let index = 0; index <= n; index++) {
+            if (index === 0) {
+                tableHTML += "<tr><td>" + index + "</td><td></td><td></td><td></td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            } else if (index === 1) {
+                let interes = saldo * i;
+                let abono = cuota + interes;
+                saldo += abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            } else {
+                cuota += g;
+                let interes = saldo * i;
+                let abono = cuota + interes;
+                saldo += abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            }
+        }
+        tableHTML += "</table>";
+        document.getElementById('result').innerHTML = tableHTML;
+    } else if (operacionTabla === 2) {
+        let saldo = va;
+        let cuota = a;
+        let tableHTML = "<table border='1'>" +
+            "<tr><th>Número cuota</th><th>Cuotas</th><th>Interes</th><th>Abono</th><th>Saldo</th></tr>";
+        for (let index = 0; index <= n; index++) {
+            if (index === 0) {
+                tableHTML += "<tr><td>" + index + "</td><td></td><td></td><td></td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            } else if (index === 1) {
+                let interes = saldo * i;
+                let abono = cuota - interes;
+                saldo -= abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            } else {
+                cuota += g;
+                let interes = saldo * i;
+                let abono = cuota - interes;
+                saldo -= abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            }
+        }
+        tableHTML += "</table>";
+        document.getElementById('result').innerHTML = tableHTML;
+    }
+}
+
+function capitalizarAmortizarGLD(va, periodo, i, a, g, operacionTabla) {
+    let n = Math.round(periodo);
+    if (operacionTabla === 1) {
+        let saldo = va;
+        let cuota = a;
+        let tableHTML = "<table border='1'>" +
+            "<tr><th>Número Cuota</th><th>Cuotas</th><th>Interes</th><th>Abono</th><th>Saldo</th></tr>";
+        for (let index = 0; index <= n; index++) {
+            if (index === 0) {
+                tableHTML += "<tr><td>" + index + "</td><td></td><td></td><td></td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            } else if (index === 1) {
+                let interes = saldo * i;
+                let abono = cuota + interes;
+                saldo += abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            } else {
+                cuota -= g;
+                let interes = saldo * i;
+                let abono = cuota + interes;
+                saldo += abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            }
+        }
+        tableHTML += "</table>";
+        document.getElementById('result').innerHTML = tableHTML;
+    } else if (operacionTabla === 2) {
+        let saldo = va;
+        let cuota = a;
+        let tableHTML = "<table border='1'>" +
+            "<tr><th>Número cuota</th><th>Cuotas</th><th>Interes</th><th>Abono</th><th>Saldo</th></tr>";
+        for (let index = 0; index <= n; index++) {
+            if (index === 0) {
+                tableHTML += "<tr><td>" + index + "</td><td></td><td></td><td></td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            } else if (index === 1) {
+                let interes = saldo * i;
+                let abono = cuota - interes;
+                saldo -= abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            } else {
+                cuota -= g;
+                let interes = saldo * i;
+                let abono = cuota - interes;
+                saldo -= abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            }
+        }
+        tableHTML += "</table>";
+        document.getElementById('result').innerHTML = tableHTML;
+    }
+}
+    
+function capitalizarAmortizarGGC(va, periodo, i, a, g, operacionTabla) {
+    let n = Math.round(periodo);
+    
+    if (operacionTabla === 1) {
+        let saldo = va;
+        let cuota = a;
+        let tableHTML = "<table border='1'>" +
+            "<tr><th>Número de Cuota</th><th>Cuota</th><th>Interés</th><th>Abono</th><th>Saldo</th></tr>";
+        
+        for (let index = 0; index <= n; index++) {
+            if (index === 0) {
+                tableHTML += "<tr><td>" + index + "</td><td></td><td></td><td></td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            } else if (index === 1) {
+                let interes = saldo * i;
+                let abono = cuota + interes;
+                saldo += abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            } else {
+                cuota = cuota + (cuota * g);
+                let interes = saldo * i;
+                let abono = cuota + interes;
+                saldo += abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            }
+        }
+        tableHTML += "</table>";
+        document.getElementById('result').innerHTML = tableHTML;
+    } else if (operacionTabla === 2) {
+        let saldo = va;
+        let cuota = a;
+        let tableHTML = "<table border='1'>" +
+            "<tr><th>Número de Cuota</th><th>Cuota</th><th>Interés</th><th>Abono</th><th>Saldo</th></tr>";
+        
+        for (let index = 0; index <= n; index++) {
+            if (index === 0) {
+                tableHTML += "<tr><td>" + index + "</td><td></td><td></td><td></td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            } else if (index === 1) {
+                let interes = saldo * i;
+                let abono = cuota - interes;
+                saldo -= abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            } else {
+                cuota = cuota + (cuota * g);
+                let interes = saldo * i;
+                let abono = cuota - interes;
+                saldo -= abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + interes.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + abono.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td><td>" + saldo.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + "</td></tr>";
+            }
+        }
+        tableHTML += "</table>";
+        document.getElementById('result').innerHTML = tableHTML;
+    }
+}
+
+function capitalizarAmortizarGGD(va, periodo, i, a, g, operacionTabla) {
+    let n = Math.round(periodo);
+    
+    if (operacionTabla === 1) {
+        let saldo = va;
+        let cuota = a;
+        let tableHTML = "<table border='1'>" +
+            "<tr><th>Número de Cuota</th><th>Cuota</th><th>Interés</th><th>Abono</th><th>Saldo</th></tr>";
+        
+        for (let index = 0; index <= n; index++) {
+            if (index === 0) {
+                tableHTML += "<tr><td>" + index + "</td><td></td><td></td><td></td><td>" + saldo.toLocaleString() + "</td></tr>";
+            } else if (index === 1) {
+                let interes = saldo * i;
+                let abono = cuota + interes;
+                saldo += abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toLocaleString() + "</td><td>" + interes.toLocaleString() + "</td><td>" + abono.toLocaleString() + "</td><td>" + saldo.toLocaleString() + "</td></tr>";
+            } else {
+                cuota = cuota - (cuota * g);
+                let interes = saldo * i;
+                let abono = cuota + interes;
+                saldo += abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toLocaleString() + "</td><td>" + interes.toLocaleString() + "</td><td>" + abono.toLocaleString() + "</td><td>" + saldo.toLocaleString() + "</td></tr>";
+            }
+        }
+        tableHTML += "</table>";
+        document.getElementById('result').innerHTML = tableHTML;
+    } else if (operacionTabla === 2) {
+        let saldo = va;
+        let cuota = a;
+        let tableHTML = "<table border='1'>" +
+            "<tr><th>Número de Cuota</th><th>Cuota</th><th>Interés</th><th>Abono</th><th>Saldo</th></tr>";
+        
+        for (let index = 0; index <= n; index++) {
+            if (index === 0) {
+                tableHTML += "<tr><td>" + index + "</td><td></td><td></td><td></td><td>" + saldo.toLocaleString() + "</td></tr>";
+            } else if (index === 1) {
+                let interes = saldo * i;
+                let abono = cuota - interes;
+                saldo -= abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toLocaleString() + "</td><td>" + interes.toLocaleString() + "</td><td>" + abono.toLocaleString() + "</td><td>" + saldo.toLocaleString() + "</td></tr>";
+            } else {
+                cuota = cuota - (cuota * g);
+                let interes = saldo * i;
+                let abono = cuota - interes;
+                saldo -= abono;
+                tableHTML += "<tr><td>" + index + "</td><td>" + cuota.toLocaleString() + "</td><td>" + interes.toLocaleString() + "</td><td>" + abono.toLocaleString() + "</td><td>" + saldo.toLocaleString() + "</td></tr>";
+            }
+        }
+        tableHTML += "</table>";
+        document.getElementById('result').innerHTML = tableHTML;
+    }
+}
+   </script>
+  </body>
+
+  </html>
+
+</body>
+
+</html>

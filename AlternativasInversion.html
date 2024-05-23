@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="Author"content ="Chaira Zapa, Luis Gabriel">
+    <link rel="icon" href="images/icon.png">
+    <link rel="stylesheet" href="css/estildos.css">
+   
+    <title>Simulación Financiera</title>
+</head>
+<body>
+     
+  <header class="header" >  
+    <div class="menu-container">
+      <ul class="menu">
+        <li><a href="index.html">Inicio</a></li>
+          <!-- <li><a href="../HTML/pag2.html">Amortización o capitalización</a></li> -->
+          <li><a href="Anualidades.html">Anualidades</a></li>
+          <li><a href="Gradiente.html">Gradientes</a></li>
+          <li><a href="AlternativasInversion.html">Simulación financiera</a></li>
+      </ul>
+  </div>
+  </header>
+
+    <title>Simulación Financiera</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+  
+      .container {
+        background-color: #138D75;
+   border: 1px solid #ccc;
+   border-radius: 5px;
+   padding: 10px;
+   width: 300px;
+   text-align: center;
+   margin: 0 auto; 
+   margin-top: 20vh;
+      }
+  
+      h2 {
+        text-align: center;
+      }
+  
+      label {
+        display: block;
+        margin-top: 10px;
+      }
+  
+      input[type="text"] {
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+      }
+  
+      input[type="button"] {
+        width: 100%;
+        padding: 10px;
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+  
+      #resultado {
+        margin-top: 20px;
+        text-align: center;
+        font-weight: bold;
+      }
+    </style>
+  
+  
+    <div class="formulario">
+      <h2>CALCULA QUE TAN RENTABLE ES TU INVERSIÓN</h2>
+        <label for="opcion">Seleccione una opción:</label>
+        <select id="opcion" onclick="mostrarCampos(this.value)">
+            <option value="0"></option>
+            <option value="1">Valor presente Neto</option>
+            <option value="2">TIR</option>
+            <option value="3">Costo / Beneficio</option>
+            <option value="4">Pay back</option>
+        </select>
+
+        <br>
+
+        <label>Ingrese los datos</label>
+    
+        <div id="campos" style="display:none;">
+            <!-- Los campos para ingresar datos se mostrarán aquí -->
+        </div>
+
+        <br>
+    
+        <button onclick="calcular()">Calcular</button>
+    
+        <div id="resultado">
+            <!-- Los resultados se mostrarán aquí -->
+        </div>
+    
+    </div>
+
+    <script src="../JS/script.js"></script>
+  
+</body>
+</html>
